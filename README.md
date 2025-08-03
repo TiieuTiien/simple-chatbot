@@ -1,184 +1,215 @@
 # Simple Chatbot
+[![Github: TiieuTiien](https://img.shields.io/badge/Github-TiieuTiien-darkgreen?logo=github)](https://github.com/TiieuTiien)
+[![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)
 
-An ADK-powered agent that fetches and summarizes game development news from Reddit subreddits like r/gamedev, r/unity3d, and r/unrealengine.
+*An intelligent multi-agent system for **fetching news** on reddit, **sumarize** it and generate **audio content***
 
-## Acknowledgements
+## About
 
-This project was inspired by and follows concepts from the excellent tutorial by **AI Oriented Dev**: 
-[Forget MCP... don't sleep on the Google Agent Development Kit (ADK) - Full tutorial](https://youtu.be/BiP4tKZKTvU)
+The Simple Chatbot is a sophisticated ADK-powered multi-agent system that revolutionizes how developers stay informed about game development trends. Built with Google's Agent Development Kit (ADK), this project combines Reddit data mining, AI-powered summarization, and text-to-speech capabilities to deliver personalized gaming industry insights through multiple channels including web interfaces, APIs, and audio content.
 
-Special thanks for the comprehensive walkthrough of Google's ADK capabilities and practical implementation examples.
+**Key Features:**
+- **Real-time Reddit Integration**: Live data from r/gamedev, r/unity3d, r/unrealengine and more
+- **AI-Powered Summarization**: Intelligent content curation in professional newscaster style  
+- **Text-to-Speech Generation**: Convert summaries to high-quality audio using ElevenLabs
+- **Multi-Agent Architecture**: Coordinated system with specialized Reddit Scout, Summarizer, and Speaker agents
+- **Flexible Deployment**: Run as CLI tools, web applications, or A2A (Agent-to-Agent) servers
 
-## Project Components
+Whether you're a game developer wanting audio briefings during commutes, a studio manager needing quick industry updates, or a researcher tracking gaming technology trends, this system provides intelligent, automated content delivery tailored to your workflow.
 
-An ADK-powered agent that fetches and summarizes game development news from Reddit subreddits like r/gamedev, r/unity3d, and r/unrealengine.
+## Agent workflow
 
-## General Setup
-
-1. **Clone the repository:**
-   ```bash
-   git clone git@github.com:TiieuTiien/simple-chatbot.git
-   cd simple-chatbot
-   ```
-
-2. **Create and activate a virtual environment:**
-   ```bash
-   python -m venv .venv
-   # On macOS/Linux
-   source .venv/bin/activate
-   # On Windows
-   .venv\Scripts\activate
-   ```
-
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Reddit Scout Agent Setup
-
-1. **Navigate to the agent directory:**
-   ```bash
-   cd agents/reddit_scout
-   ```
-
-2. **Configure environment variables:**
-   - Copy the example file:
-     ```bash
-     cp .env.example .env
-     ```
-   - Edit `.env` and configure your credentials:
-
-   **Option A: Google AI Studio API Key (Recommended for testing)**
-   ```dotenv
-   GOOGLE_GENAI_USE_VERTEXAI="False"
-   GOOGLE_API_KEY="your-google-ai-studio-api-key"
-   ```
-
-   **Option B: Vertex AI (For production)**
-   ```dotenv
-   GOOGLE_GENAI_USE_VERTEXAI="True"
-   GOOGLE_CLOUD_PROJECT="your-gcp-project-id"
-   GOOGLE_CLOUD_LOCATION="us-central1"
-   ```
-
-   **Reddit API Configuration:**
-   ```dotenv
-   REDDIT_CLIENT_ID="your-reddit-client-id"
-   REDDIT_CLIENT_SECRET="your-reddit-client-secret"
-   REDDIT_USER_AGENT="GameDevNewsScout/0.1 by YourUsername"
-   ```
-
-3. **Get Reddit API credentials:**
-   - Go to [Reddit App Preferences](https://www.reddit.com/prefs/apps)
-   - Create a new application (script type)
-   - Note down your client ID and secret
-
-4. **Run the Reddit Scout agent:**
-   ```bash
-   # From the project root
-   adk run agents/reddit_scout
-   ```
+<html>
+    <h2 align="center">
+      <img src="./assets/Agent_Architecture.png"/>
+    </h2>
+<html>
 
 ## Project Structure
 
 ```
 simple-chatbot/
-├── chatbot.py               # Basic chatbot example
-├── agents/                  # ADK agents directory
+├── README.md                # Project documentation
+├── requirements.txt         # Python dependencies
+├── .gitignore               # Ignore unnecessary files
+├── apps/                   # Streamlit applications
+│   └── speaker_app.py      # Web interface for the chatbot
+├── agents/                 # ADK agents directory
 │   ├── __init__.py
-│   └── reddit_scout/        # Reddit Scout Agent
+│   ├── .env.example        # Environment template
+│   ├── .env                # Environment variables (not in git)
+│   ├── coordinator/        # Main orchestrator agent
+│   │   ├── __init__.py
+│   │   └── agents.py
+│   ├── async_reddit_scout/ # Reddit data fetching agent
+│   │   ├── __init__.py
+│   │   ├── agents.py       # Reddit API integration
+│   │   └── tools/          # MCP Reddit tools
+│   ├── summarizer/         # AI content summarization agent
+│   │   ├── __init__.py
+│   │   └── agents.py       # News summarization logic
+│   └── speaker/            # Text-to-speech agent
 │       ├── __init__.py
-│       ├── agents.py        # Main agent implementation
-│       ├── .env             # Environment variables (not in git)
-│       └── .env.example     # Environment template
-├── .book.venv/              # Virtual environment
-└── README.md                # This file
+│       ├── agents.py       # ElevenLabs TTS integration
+│       └── audio_output/   # Generated audio files
+├── scripts/                # Testing and utility scripts
+│   └── test/
+│       └── speaker/
+│           └── test_extract_audio.sh
+├── tests/                  # Unit tests
+└── .venv/                  # Virtual environment (local)
 ```
 
-## Usage Examples
+## Installation for Users
 
-### Running the Agent
+### Quick Start (Recommended)
+```bash
+# Clone and set up the project
+git clone git@github.com:TiieuTiien/simple-chatbot.git
+cd simple-chatbot
 
-To interact with the Reddit Scout agent, you can use the following commands from your project root:
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-**Run in CLI mode:**
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment
+cp agents/.env.example agents/.env
+# Edit agents/.env with your API keys (see Configuration section)
+
+# Run the Streamlit web app
+streamlit run apps/speaker_app.py
+```
+
+### Configuration
+
+Edit `agents/.env` with your API credentials:
 
 ```bash
-adk run agents/reddit_scout
+# Google AI API (required)
+GOOGLE_API_KEY="your-google-ai-studio-api-key"
+
+# OpenRouter API Key (For OpenRouter models)
+OPENROUTER_API_KEY="paste-your-openrouter-api-key-here"
+
+# Reddit API (required for live data)
+REDDIT_CLIENT_ID="your-reddit-client-id" 
+REDDIT_CLIENT_SECRET="your-reddit-client-secret"
+REDDIT_USER_AGENT="YourApp/1.0 by YourUsername"
+
+# ElevenLabs API (required for text-to-speech)
+ELEVENLABS_API_KEY="your-elevenlabs-api-key"
 ```
 
-**Run with the ADK web interface:**
+**Get API Keys:**
+- [Google AI Studio](https://aistudio.google.com/) - Free tier available
+- [OpenRouter](https://openrouter.ai/) - Free tier available
+- [Reddit API](https://www.reddit.com/prefs/apps) - Free for personal use
+- [ElevenLabs](https://elevenlabs.io/) - Free tier with 10k characters/month
 
+### Usage Examples
+
+**Web Interface:**
 ```bash
-adk web agents/reddit_scout
+# Navigate to agents folder
+cd agents
+
+# Launch adk default web interface
+adk web
 ```
 
-This will launch a local web UI where you can chat with the agent in your browser.
+**Custom Web Interface:**
+```bash
+# Start the ADK API server
+adk api_server
 
-Try these example prompts:
-- `What's the latest game development news?`
-- `Give me news from r/unity3d`
-- `Show me posts from unrealengine subreddit`
-- `Any updates from the gamedev community?`
+# Launch Streamlit chat interface (in another terminal)
+streamlit run apps/speaker_app.py
+```
 
-The agent will:
-1. Identify the appropriate subreddit(s)
-2. Fetch recent hot posts using the Reddit API
-3. Present them in a formatted list
-4. Fall back to mock data if Reddit API is unavailable
+**CLI Mode:**
+```bash
+# Run individual agents
+adk run agents/reddit_scout     # Reddit news fetching
+adk run agents/summarizer       # AI summarization
+adk run agents/speaker          # Text-to-speech
+adk run agents/coordinator      # Full pipeline
+```
 
-## Features
+**Try these prompts:**
+- "Get me the latest game development news"
+- "Summarize hot posts from r/unity3d"  
+- "Read me the latest updates from r/unrealengine"
+- "What's trending in gamedev and speak it to me"
 
-### Reddit Scout Agent Capabilities:
-- **Real Reddit Integration**: Fetches live data from Reddit's API
-- **Multiple Subreddit Support**: Supports r/gamedev, r/unity3d, r/unrealengine, and more
-- **Intelligent Subreddit Detection**: Automatically determines which subreddit to query
-- **Error Handling**: Graceful fallback and error reporting
-- **Mock Data Fallback**: Provides sample data when API is unavailable
+## Installation for Contributors
 
-## Troubleshooting
+### Development Setup
+```bash
+# Clone with development dependencies
+git clone git@github.com:TiieuTiien/simple-chatbot.git
+cd simple-chatbot
 
-### Common Issues:
+# Set up development environment
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-1. **ImportError: cannot import name 'agent'**
-   - Ensure your file is named `agents.py` (as shown in the project structure)
-   - Check that `__init__.py` imports match your file names
+### Local Testing
+```bash
+# Test individual agents
+cd agents/reddit_scout && adk run .
+python -m agents.speaker
 
-2. **Reddit API Errors**
-   - Verify your Reddit API credentials in `.env`
-   - Ensure your user agent string is descriptive and unique
-   - Check that requested subreddits exist and are accessible
+# Test API endpoints
+curl -X POST "http://localhost:8000/run" \
+  -H "Content-Type: application/json" \
+  -d '{"app_name": "speaker", "user_id": "test", "session_id": "123", "new_message": {"parts": [{"text": "Hello"}], "role": "user"}}'
 
-3. **Google AI API Issues**
-   - Verify your API key is correct and active
-   - Check your API quotas and usage limits
-   - Ensure you have the correct model permissions
+# Test audio extraction
+./scripts/test/speaker/test_extract_audio.sh
+```
 
-4. **Agent Not Found or Not Running from Correct Directory**
-    - Make sure you navigate to the `agents/reddit_scout` directory before running the agent.
-    - Example:
-      ```bash
-      cd agents/reddit_scout
-      adk run .
-      ```
-    - Running from the wrong directory can cause import or path errors.
+## Contributing Guidelines
 
-## Development Notes
+We welcome contributions! Please follow these guidelines:
 
-This project uses:
-- **Google Generative AI SDK** for the basic chatbot
-- **Google ADK (Agent Development Kit)** for the Reddit Scout agent
-- **PRAW (Python Reddit API Wrapper)** for Reddit integration
-- **python-dotenv** for environment variable management
+**Before submitting:**
+- Create an issue first to discuss major changes
+- Ensure all tests pass: `python -m pytest`
+- Follow existing code style and patterns
+- Update documentation for new features
 
-## Resources
+**Pull Request Requirements:**
+- Squash commits into logical units
+- Include tests for new functionality  
+- Update README if adding user-facing features
+- Reference the issue number in PR description
 
-- [Google AI Studio](https://aistudio.google.com/) - Get your API keys
-- [Google ADK Documentation](https://developers.google.com/adk) - Official ADK docs
-- [Reddit API Documentation](https://www.reddit.com/dev/api/) - Reddit API reference
-- [AI Oriented Dev YouTube Channel](https://www.youtube.com/@AIOriented) - More AI development tutorials
+**Code Standards:**
+- Use type hints where possible
+- Follow Google-style docstrings
+- Keep functions focused and well-named
+- Add logging for debugging and monitoring
 
-## License
+**Agent Development:**
+- Follow ADK patterns and conventions
+- Include proper error handling and fallbacks
+- Test with mock data when APIs unavailable
+- Document environment variables and dependencies
 
-This project is for educational and demonstration purposes only.
+## Support This Project
+
+If this project helps you stay informed about game development trends or saves you time, consider:
+
+- ⭐ **Star this repository** to help others discover it
+- 🐛 **Report bugs** or suggest improvements via issues
+- 🔄 **Share with fellow developers** who might benefit
+- 💡 **Contribute code** - see Contributing Guidelines above
+
+---
+
+*Inspired by [AI Oriented Dev's ADK Tutorial](https://youtu.be/BiP4tKZKTvU) - Building practical AI agent systems for real-world applications.*

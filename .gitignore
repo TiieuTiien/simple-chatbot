@@ -104,3 +104,6 @@ venv.bak/
 
 # ADK specific
 *.adk_cache/ 
+
+# macOS specific
+.DS_Store
